@@ -41,12 +41,12 @@ export const signLocal = (payload, type) => async dispatch => {
 
 export const googleSign = accessToken => async dispatch => {
   try {
-    console.log(accessToken);
     const response = await axios.post(`${URL}api/auth/google`, {
-      accessToken: accessToken
+      accessToken
     });
 
     const token = response.headers['x-auth-token'];
+
     dispatch({
       type: SET_AUTH,
       token
