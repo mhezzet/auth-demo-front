@@ -5,7 +5,6 @@
 */
 
 export const SIGN_LOCAL = 'SIGN_LOCAL';
-export const SIGN_LOCAL_ERR = 'SIGN_LOCAL_ERR';
 export const SIGN_OUT = 'SIGN_OUT';
 export const SET_AUTH = 'SET_AUTH';
 

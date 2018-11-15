@@ -17,16 +17,16 @@ class SignUpPage extends Component {
         .required()
     });
 
-  onSubmitHandler = (values, { setSubmitting, resetForm }) => {
-    this.props.signLocal(values, 'up', error => {
-      if (error) {
-        setSubmitting(false);
-        resetForm();
-      } else {
-        alert('success');
-        this.props.history.push('/dashboard');
-      }
-    });
+  onSubmitHandler = async (values, { setSubmitting, resetForm, setErrors }) => {
+    try {
+      await this.props.signLocal(values, 'up');
+      alert('success');
+      this.props.history.push('/dashboard');
+    } catch (err) {
+      resetForm();
+      setErrors({ server: err });
+      setSubmitting(false);
+    }
   };
 
   render() {
@@ -35,36 +35,37 @@ class SignUpPage extends Component {
     }
 
     return (
-      <React.Fragment>
-        <div className="jumbotron my-form">
-          <h3 style={{ textAlign: 'center' }}>Sign Up</h3>
-          <div className="d-flex justify-content-center">
-            <div className="m-3 btn btn-secondary">Google</div>
-            <div className="m-3 btn btn-secondary">Facebook</div>
-          </div>
-          <hr />
-          {this.props.authErr && (
-            <div style={{ textAlign: 'center' }} className="alert-danger">
-              {this.props.authErr}{' '}
-            </div>
-          )}
-
-          <Formik
-            initialValues={{ email: '', password: '' }}
-            onSubmit={this.onSubmitHandler}
-            validationSchema={this.validationSchema}
-          >
-            {props => {
-              const {
-                values,
-                touched,
-                errors,
-                dirty,
-                isSubmitting,
-                handleReset
-              } = props;
-              return (
+      <Formik
+        initialValues={{ email: '', password: '' }}
+        onSubmit={this.onSubmitHandler}
+        validationSchema={this.validationSchema}
+      >
+        {props => {
+          const {
+            values,
+            touched,
+            errors,
+            dirty,
+            isSubmitting,
+            handleReset
+          } = props;
+          return (
+            <React.Fragment>
+              <div className="jumbotron my-form">
+                <h3 style={{ textAlign: 'center' }}>Sign Up</h3>
+                <div className="d-flex justify-content-center">
+                  <div className="m-3 btn btn-secondary">Google</div>
+                  <div className="m-3 btn btn-secondary">Facebook</div>
+                </div>
+                <hr />
+                {errors.server && (
+                  <div style={{ textAlign: 'center' }} className="alert-danger">
+                    {errors.server}
+                  </div>
+                )}
                 <Form>
+                  <h1>{console.log(errors.server)}</h1>
+                  {console.log(this.props)}
                   <div className="form-group">
                     <label htmlFor="email">Email</label>
                     <Field
@@ -120,17 +121,16 @@ class SignUpPage extends Component {
                     </button>
                   </div>
                 </Form>
-              );
-            }}
-          </Formik>
-        </div>
-      </React.Fragment>
+              </div>
+            </React.Fragment>
+          );
+        }}
+      </Formik>
     );
   }
 }
 
 const mapStateToProps = ({ auth }) => ({
-  authErr: auth.errorMessage,
   isAuthenticated: auth.isAuthenticated
 });
 

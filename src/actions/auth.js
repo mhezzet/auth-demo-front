@@ -1,11 +1,5 @@
 import axios from 'axios';
-import {
-  SIGN_LOCAL,
-  SIGN_LOCAL_ERR,
-  SET_USER,
-  UNSET_USER,
-  SIGN_OUT
-} from './types';
+import { SIGN_LOCAL, SET_USER, UNSET_USER, SIGN_OUT } from './types';
 
 /**
 |--------------------------------------------------
@@ -13,7 +7,7 @@ import {
 |--------------------------------------------------
 */
 
-export const signLocal = (payload, type, callback) => async dispatch => {
+export const signLocal = (payload, type) => async dispatch => {
   try {
     const query = type === 'in' ? '/auth/local' : '/users';
 
@@ -26,10 +20,6 @@ export const signLocal = (payload, type, callback) => async dispatch => {
       type: SIGN_LOCAL,
       token,
       isAuthenticated: true
-    });
-    dispatch({
-      type: SIGN_LOCAL_ERR,
-      err: ''
     });
 
     let profile = {
@@ -45,14 +35,9 @@ export const signLocal = (payload, type, callback) => async dispatch => {
       payload: response.data
     });
 
-    callback(false);
-  } catch (ex) {
-    console.log(ex.response.data);
-    dispatch({
-      type: SIGN_LOCAL_ERR,
-      err: ex.response.data
-    });
-    callback(true);
+    return Promise.resolve();
+  } catch ({ response }) {
+    return Promise.reject(response.data);
   }
 };
 

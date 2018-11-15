@@ -1,25 +1,14 @@
-import {
-  SIGN_LOCAL,
-  SIGN_LOCAL_ERR,
-  SIGN_OUT,
-  SET_AUTH
-} from '../actions/types';
+import { SIGN_LOCAL, SIGN_OUT, SET_AUTH } from '../actions/types';
 
 const initialState = {
   isAuthenticated: false,
-  token: '',
-  errorMessage: ''
+  token: ''
 };
 
-export default (
-  state = initialState,
-  { type, token, err, isAuthenticated }
-) => {
+export default (state = initialState, { type, token, isAuthenticated }) => {
   switch (type) {
     case SIGN_LOCAL:
       return { ...state, token, isAuthenticated };
-    case SIGN_LOCAL_ERR:
-      return { ...state, errorMessage: err };
     case SIGN_OUT:
       return initialState;
     case SET_AUTH:
