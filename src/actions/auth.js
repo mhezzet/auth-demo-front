@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SIGN_LOCAL, SET_USER, UNSET_USER, SIGN_OUT } from './types';
+import { SET_AUTH, SET_USER, UNSET_USER, SIGN_OUT } from './types';
 
 /**
 |--------------------------------------------------
@@ -17,18 +17,12 @@ export const signLocal = (payload, type) => async dispatch => {
     );
     const token = response.headers['x-auth-token'];
     dispatch({
-      type: SIGN_LOCAL,
-      token,
-      isAuthenticated: true
+      type: SET_AUTH,
+      token
     });
 
-    let profile = {
-      ...response.data
-    };
-
-    profile = JSON.stringify(profile);
     localStorage.setItem('token', token);
-    localStorage.setItem('profile', profile);
+    localStorage.setItem('profile', JSON.stringify(response.data));
 
     dispatch({
       type: SET_USER,
@@ -37,6 +31,75 @@ export const signLocal = (payload, type) => async dispatch => {
 
     return Promise.resolve();
   } catch ({ response }) {
+    return Promise.reject(response.data);
+  }
+};
+
+/**
+|--------------------------------------------------
+| SignUp Google
+|--------------------------------------------------
+*/
+
+export const googleSign = accessToken => async dispatch => {
+  try {
+    console.log(accessToken);
+    const response = await axios.post('http://localhost:3000/api/auth/google', {
+      accessToken: accessToken
+    });
+
+    const token = response.headers['x-auth-token'];
+    dispatch({
+      type: SET_AUTH,
+      token
+    });
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('profile', JSON.stringify(response.data));
+
+    dispatch({
+      type: SET_USER,
+      payload: response.data
+    });
+
+    return Promise.resolve();
+  } catch ({ response }) {
+    console.log(response);
+    return Promise.reject(response.data);
+  }
+};
+
+/**
+|--------------------------------------------------
+| SignUp Facebook
+|--------------------------------------------------
+*/
+
+export const facebookSign = accessToken => async dispatch => {
+  try {
+    const response = await axios.post(
+      'http://localhost:3000/api/auth/facebook',
+      { accessToken }
+    );
+
+    const token = response.headers['x-auth-token'];
+
+    dispatch({
+      type: SET_AUTH,
+      token
+    });
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('profile', JSON.stringify(response.data));
+
+    dispatch({
+      type: SET_USER,
+      payload: response.data
+    });
+
+    return Promise.resolve();
+  } catch ({ response }) {
+    console.log(response);
     return Promise.reject(response.data);
   }
 };

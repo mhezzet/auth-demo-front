@@ -1,10 +1,32 @@
 import React, { Component } from 'react';
 import { Formik, Form, Field } from 'formik';
+import GoogleLogin from 'react-google-login';
+import FacebookLogin from 'react-facebook-login';
 import { connect } from 'react-redux';
-import { signLocal } from '../../actions/auth';
+import { signLocal, facebookSign, googleSign } from '../../actions/auth';
 import * as yup from 'yup';
 
 class SignUpPage extends Component {
+  googleResponse = async ({ accessToken, error }) => {
+    if (error) return;
+    try {
+      await this.props.googleSign(accessToken);
+      this.props.history.push('/dashboard');
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  facebookResponse = async ({ accessToken }) => {
+    if (!accessToken) return;
+    try {
+      await this.props.facebookSign(accessToken);
+      this.props.history.push('/dashboard');
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   validationSchema = () =>
     yup.object().shape({
       email: yup
@@ -54,8 +76,24 @@ class SignUpPage extends Component {
               <div className="jumbotron my-form">
                 <h3 style={{ textAlign: 'center' }}>Sign Up</h3>
                 <div className="d-flex justify-content-center">
-                  <div className="m-3 btn btn-secondary">Google</div>
-                  <div className="m-3 btn btn-secondary">Facebook</div>
+                  <div className="m-3 ">
+                    <GoogleLogin
+                      clientId="539492742685-hb4d1j9u17f5curru38e06b1aa8v1h97.apps.googleusercontent.com"
+                      buttonText="Google"
+                      onSuccess={this.googleResponse}
+                      onFailure={this.googleResponse}
+                      className="btn btn-outline-danger"
+                    />
+                  </div>
+                  <div className="m-3 ">
+                    <FacebookLogin
+                      appId="710987649285731"
+                      textButton="Facebook"
+                      fields="email,picture"
+                      callback={this.facebookResponse}
+                      cssClass="btn btn-outline-primary"
+                    />
+                  </div>
                 </div>
                 <hr />
                 {errors.server && (
@@ -64,8 +102,6 @@ class SignUpPage extends Component {
                   </div>
                 )}
                 <Form>
-                  <h1>{console.log(errors.server)}</h1>
-                  {console.log(this.props)}
                   <div className="form-group">
                     <label htmlFor="email">Email</label>
                     <Field
@@ -136,5 +172,5 @@ const mapStateToProps = ({ auth }) => ({
 
 export default connect(
   mapStateToProps,
-  { signLocal }
+  { signLocal, facebookSign, googleSign }
 )(SignUpPage);
