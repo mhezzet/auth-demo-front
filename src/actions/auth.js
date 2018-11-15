@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { SET_AUTH, SET_USER, UNSET_USER, SIGN_OUT } from './types';
+const URL = 'https://auth-demo-app.herokuapp.com/';
 
 /**
 |--------------------------------------------------
@@ -11,10 +12,7 @@ export const signLocal = (payload, type) => async dispatch => {
   try {
     const query = type === 'in' ? '/auth/local' : '/users';
 
-    const response = await axios.post(
-      `http://localhost:3000/api${query}`,
-      payload
-    );
+    const response = await axios.post(`${URL}api${query}`, payload);
     const token = response.headers['x-auth-token'];
     dispatch({
       type: SET_AUTH,
@@ -44,7 +42,7 @@ export const signLocal = (payload, type) => async dispatch => {
 export const googleSign = accessToken => async dispatch => {
   try {
     console.log(accessToken);
-    const response = await axios.post('http://localhost:3000/api/auth/google', {
+    const response = await axios.post(`${URL}api/auth/google`, {
       accessToken: accessToken
     });
 
@@ -77,10 +75,9 @@ export const googleSign = accessToken => async dispatch => {
 
 export const facebookSign = accessToken => async dispatch => {
   try {
-    const response = await axios.post(
-      'http://localhost:3000/api/auth/facebook',
-      { accessToken }
-    );
+    const response = await axios.post(`${URL}api/auth/facebook`, {
+      accessToken
+    });
 
     const token = response.headers['x-auth-token'];
 
